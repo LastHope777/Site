@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Кулинарный проект - Добавить рецепт</title>
+
+    <style>
+        main {
+            background-color: #fffaf0;
+            border: 2px solid #d2b48c;
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        input, textarea, select {
+            padding: 6px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            border: 1px solid #b8860b;
+            border-radius: 4px;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 8px;
+        }
+
+        .checkbox-group label {
+            font-weight: normal;
+            margin-top: 0;
+        }
+
+        small {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .error {
+            color: red;
+            font-size: 13px;
+            min-height: 18px;
+            margin-bottom: 5px;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #fff;
+            border: 1px solid #b8860b;
+            padding: 8px 12px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #f0e0c0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <p><strong>Кулинарный проект</strong></p>
+        <nav>
+            <a href="index.html"><button>Логотип</button></a>
+            <a href="catalog.html"><button>Каталог рецептов</button></a>
+            <a href="cafes.html"><button>Каталог кафе и ресторанов</button></a>
+            <a href="articles.html"><button>Статьи и советы</button></a>
+            <a href="about.html"><button>О проекте и контакты</button></a>
+            <a href="faq.html"><button>Ответы на вопросы</button></a>
+            <a href="account.html"><button>Личный кабинет</button></a>
+            <a href="add_recipe.html"><button>Добавить рецепт</button></a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Добавить рецепт</h1>
+
+        <form id="recipeForm">
+            <label>Название рецепта:</label>
+            <input type="text" id="recipeName" maxlength="200" placeholder="Например: Борщ">
+            <small>Только буквы, цифры и пробелы, от 3 до 200 символов</small>
+            <div id="errorName" class="error"></div>
+
+            <label>Описание:</label>
+            <textarea id="description" rows="3" maxlength="2000" placeholder="Краткое описание блюда"></textarea>
+            <small>От 10 до 2000 символов</small>
+            <div id="errorDescription" class="error"></div>
+
+            <label>Кухня:</label>
+            <select id="cuisine">
+                <option value="">Выберите кухню</option>
+                <option value="russian">Русская</option>
+                <option value="italian">Итальянская</option>
+                <option value="japan">Японская</option>
+                <option value="china">Китайская</option>
+                <option value="american">Американская</option>
+                <option value="french">Французская</option>
+                <option value="arabic">Арабская</option>
+            </select>
+            <div id="errorCuisine" class="error"></div>
+
+            <label>Тип блюда:</label>
+            <select id="dishType">
+                <option value="">Выберите тип</option>
+                <option value="soup">Суп</option>
+                <option value="salad">Салат</option>
+                <option value="dessert">Десерт</option>
+                <option value="main">Основное</option>
+                <option value="garnish">Гарнир</option>
+                <option value="drink">Напиток</option>
+            </select>
+            <div id="errorDishType" class="error"></div>
+
+            <label>Основной ингредиент:</label>
+            <select id="mainIngredient">
+                <option value="">Выберите ингредиент</option>
+                <option value="meat">Мясо</option>
+                <option value="veggy">Овощи</option>
+                <option value="fish">Рыба</option>
+                <option value="grain">Крупы</option>
+            </select>
+            <div id="errorMainIngredient" class="error"></div>
+
+            <label>Особенности:</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="isVegetarian"> Вегетарианское</label>
+                <label><input type="checkbox" id="isLactoseFree"> Без лактозы</label>
+                <label><input type="checkbox" id="isGlutenFree"> Без глютена</label>
+                <label><input type="checkbox" id="isSugarFree"> Без сахара</label>
+            </div>
+            <div id="errorFeatures" class="error"></div>
+
+            <label>Количество порций (для ингредиентов):</label>
+            <input type="number" id="portions" min="1" max="20" value="4">
+            <small>От 1 до 20 — для расчёта количества ингредиентов</small>
+            <div id="errorPortions" class="error"></div>
+
+            <label>Ингредиенты (каждая строка: название, количество, единица):</label>
+            <textarea id="ingredients" rows="6" placeholder="Мука, 1, стакан&#10;Сахар, 100, г&#10;Соль, 0, по вкусу"></textarea>
+            <small>Формат: Название, количество, единица. Для «по вкусу» укажите 0 и «по вкусу»</small>
+            <div id="errorIngredients" class="error"></div>
+
+            <label>Шаги приготовления (каждый шаг — с новой строки):</label>
+            <textarea id="steps" rows="5" placeholder="Нарежьте лук.&#10;Обжарьте на сковороде.&#10;Добавьте остальные ингредиенты."></textarea>
+            <small>Минимум 1 шаг</small>
+            <div id="errorSteps" class="error"></div>
+
+            <label>Изображение (имя файла):</label>
+            <input type="text" id="imageFile" placeholder="recipe.jpg" maxlength="100">
+            <small>Укажите имя файла (jpg, png, gif). Поместите файл в папку <strong>images/</strong> вашего проекта.</small>
+            <div id="errorImage" class="error"></div>
+
+            <button type="submit">Добавить рецепт</button>
+            <div id="submitResult"></div>
+        </form>
+    </main>
+
+    <footer>
+        <a href="catalog.html"><button>Каталог рецептов</button></a>
+        <a href="add_recipe.html"><button>Добавить рецепт</button></a>
+        <p>Email: nikita_pishk@rambler.ru</p>
+        <p>Phone: +7(929)854-05-20</p>
+    </footer>
+
+    <script>
+        const API_BASE_URL = "nikitapishkov-001-site1.ntempurl.com";
+
+        const namePattern = /^[A-Za-zА-Яа-яЁё0-9\s\-]{3,200}$/;
+        const imagePattern = /^[a-zA-Z0-9_\-\.]+\.(jpg|jpeg|png|gif)$/i;
+
+        function parseIngredients(text, basePortions) {
+            const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+            const result = [];
+            for (const line of lines) {
+                const parts = line.split(',').map(p => p.trim());
+                if (parts.length >= 3) {
+                    const name = parts[0];
+                    const amount = parseFloat(parts[1]);
+                    const unit = parts.slice(2).join(', ').trim();
+                    const isFlexible = isNaN(amount) || amount === 0 || unit.toLowerCase().includes('по вкусу') || unit.toLowerCase().includes('щепотка');
+                    result.push({
+                        name: name,
+                        amount: isFlexible ? 0 : (amount || 0),
+                        unit: unit || 'шт.',
+                        basePortions: basePortions,
+                        isFlexible: isFlexible
+                    });
+                } else if (parts.length >= 1 && parts[0]) {
+                    result.push({
+                        name: parts[0],
+                        amount: 0,
+                        unit: parts[1] || 'по вкусу',
+                        basePortions: basePortions,
+                        isFlexible: true
+                    });
+                }
+            }
+            return result;
+        }
+
+        function parseSteps(text) {
+            return text.trim().split(/\r?\n/)
+                .map(s => s.trim())
+                .filter(s => s.length > 0);
+        }
+
+        function validateForm() {
+            const name = document.getElementById("recipeName").value.trim();
+            const description = document.getElementById("description").value.trim();
+            const cuisine = document.getElementById("cuisine").value;
+            const dishType = document.getElementById("dishType").value;
+            const mainIngredient = document.getElementById("mainIngredient").value;
+            const portions = parseInt(document.getElementById("portions").value, 10);
+            const ingredients = document.getElementById("ingredients").value.trim();
+            const steps = document.getElementById("steps").value.trim();
+            const imageFile = document.getElementById("imageFile").value.trim();
+
+            document.querySelectorAll(".error").forEach(e => e.textContent = "");
+            let valid = true;
+
+            if (!namePattern.test(name)) {
+                document.getElementById("errorName").textContent = "Название: только буквы, цифры, пробелы и дефис, от 3 до 200 символов";
+                valid = false;
+            }
+
+            if (description.length < 10 || description.length > 2000) {
+                document.getElementById("errorDescription").textContent = "Описание: от 10 до 2000 символов";
+                valid = false;
+            }
+
+            if (!cuisine) {
+                document.getElementById("errorCuisine").textContent = "Выберите кухню";
+                valid = false;
+            }
+
+            if (!dishType) {
+                document.getElementById("errorDishType").textContent = "Выберите тип блюда";
+                valid = false;
+            }
+
+            if (!mainIngredient) {
+                document.getElementById("errorMainIngredient").textContent = "Выберите основной ингредиент";
+                valid = false;
+            }
+
+            if (isNaN(portions) || portions < 1 || portions > 20) {
+                document.getElementById("errorPortions").textContent = "Порции: от 1 до 20";
+                valid = false;
+            }
+
+            const ingParsed = parseIngredients(ingredients, portions);
+            if (ingParsed.length === 0) {
+                document.getElementById("errorIngredients").textContent = "Введите минимум один ингредиент (формат: Название, количество, единица)";
+                valid = false;
+            }
+
+            const stepsParsed = parseSteps(steps);
+            if (stepsParsed.length === 0) {
+                document.getElementById("errorSteps").textContent = "Введите минимум один шаг приготовления";
+                valid = false;
+            }
+
+            if (!imageFile) {
+                document.getElementById("errorImage").textContent = "Укажите имя файла изображения";
+                valid = false;
+            } else if (!imagePattern.test(imageFile)) {
+                document.getElementById("errorImage").textContent = "Формат: имя_файла.jpg (допустимы jpg, jpeg, png, gif)";
+                valid = false;
+            }
+
+            return valid ? { name, description, cuisine, dishType, mainIngredient, portions, ingParsed, stepsParsed, imageFile } : null;
+        }
+
+        document.getElementById("recipeForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const result = document.getElementById("submitResult");
+            result.textContent = "";
+            result.className = "";
+
+            const data = validateForm();
+            if (!data) return;
+
+            const payload = {
+                title: data.name,
+                description: data.description,
+                image: data.imageFile,
+                cuisine: data.cuisine,
+                dishType: data.dishType,
+                mainIngredient: data.mainIngredient,
+                isVegetarian: document.getElementById("isVegetarian").checked,
+                isLactoseFree: document.getElementById("isLactoseFree").checked,
+                isGlutenFree: document.getElementById("isGlutenFree").checked,
+                isSugarFree: document.getElementById("isSugarFree").checked,
+                ingredients: data.ingParsed,
+                steps: data.stepsParsed
+            };
+
+            try {
+                const response = await fetch(API_BASE_URL + "/api/recipes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const respData = await response.json();
+
+                if (response.ok && respData.success) {
+                    result.className = "success";
+                    result.textContent = "Рецепт успешно добавлен! ID: " + respData.id + ". Перейти в каталог: ";
+                    const link = document.createElement("a");
+                    link.href = "catalog.html";
+                    link.textContent = "Каталог рецептов";
+                    link.style.marginLeft = "5px";
+                    result.appendChild(link);
+                    document.getElementById("recipeForm").reset();
+                } else {
+                    result.className = "error";
+                    result.textContent = respData.message || "Ошибка при добавлении рецепта";
+                }
+            } catch (err) {
+                result.className = "error";
+                result.textContent = "Ошибка сети. Проверьте, что API запущен.";
+            }
+        });
+    </script>
+</body>
+</html>

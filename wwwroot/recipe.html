@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Кулинарный проект - Рецепт</title>
+
+    <style>
+        .preview-list img {
+            width: 70px;
+            height: 50px;
+            border: 1px solid #b8860b;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-radius: 5px;
+        }
+        .preview-list img:hover {
+            transform: scale(1.1);
+        }
+        #modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        #modal img {
+            width: 600px;
+            height: auto;
+            border-radius: 8px;
+            border: 3px solid white;
+        }
+        .recipe-link {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+        }
+        .recipe-link:hover {
+            text-decoration: underline;
+        }
+        .recipe-link img {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <strong><p>Кулинарный проект</p></strong>
+    <nav>
+        <a href="index.html"><button>Логотип</button></a>
+        <a href="catalog.html"><button>Каталог рецептов</button></a>
+        <a href="cafes.html"><button>Каталог кафе и ресторанов</button></a>
+        <a href="about.html"><button>О проекте и контакты</button></a>
+        <a href="faq.html"><button>Ответы на вопросы</button></a>
+        <a href="account.html"><button>Личный кабинет</button></a>
+        <a href="add_recipe.html"><button>Добавить рецепт</button></a>
+    </nav>
+</header>
+
+<main id="recipeMain">
+    <div id="recipeLoading">Загрузка рецепта...</div>
+    <div id="recipeContent" style="display:none;">
+        <h1>
+            <span id="recipeTitle"></span>
+            <button class="favorite-btn" id="favoriteRecipeBtn" aria-label="Добавить в избранное">☆</button>
+        </h1>
+
+        <div style="margin: 10px 0;">
+            <label><strong>Количество порций:</strong></label>
+            <select id="portionsSelect">
+                <option value="2">2 порции</option>
+                <option value="4" selected>4 порции</option>
+                <option value="6">6 порций</option>
+                <option value="8">8 порций</option>
+                <option value="10">10 порций</option>
+            </select>
+        </div>
+
+        <table border="1">
+            <tr>
+                <td valign="top">
+                    <img id="mainImage" src="" alt="" width="400" height="300" style="cursor:pointer;object-fit:cover;border-radius:8px;"/>
+                    <div class="preview-list" id="previewList" style="margin-top:10px;"></div>
+                </td>
+                <td valign="top">
+                    <p><strong>Ингредиенты</strong></p>
+                    <ul id="ingredientsList"></ul>
+                    <p><strong>Процесс приготовления</strong></p>
+                    <ol id="stepsList"></ol>
+                </td>
+            </tr>
+        </table>
+
+        <section style="margin-top: 30px;">
+            <h2>Комментарии</h2>
+            <div id="commentsContainer">Загрузка комментариев...</div>
+            <h3 style="margin-top:20px;">Добавить комментарий</h3>
+            <form id="commentForm">
+                <div style="margin-bottom:10px;">
+                    <label>Ваше имя:
+                        <input type="text" id="commentAuthor" required />
+                    </label>
+                </div>
+                <div style="margin-bottom:10px;">
+                    <label>Комментарий:<br />
+                        <textarea id="commentText" rows="4" cols="50" required></textarea>
+                    </label>
+                </div>
+                <button type="submit">Отправить</button>
+            </form>
+        </section>
+    </div>
+    <div id="recipeError" style="display:none;"></div>
+</main>
+
+<div id="modal" onclick="this.style.display='none'">
+    <img src="" id="modalImg">
+</div>
+
+<footer>
+    <a href="catalog.html"><button>Каталог рецептов</button></a>
+    <a href="cafes.html"><button>Каталог кафе и ресторанов</button></a>
+    <a href="articles.html"><button>Статьи и советы</button></a>
+    <a href="about.html"><button>О проекте и контакты</button></a>
+    <a href="faq.html"><button>Ответы на вопросы</button></a>
+    <a href="account.html"><button>Личный кабинет</button></a>
+    <p>Email: nikita_pishk@rambler.ru</p>
+    <p>Phone: +7(929)854-05-20</p>
+</footer>
+
+<script>
+    const API_BASE_URL = "nikitapishkov-001-site1.ntempurl.com";
+
+    const PORTIONS_OPTIONS = [2, 4, 6, 8, 10];
+
+    function getRecipeIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const id = parseInt(params.get("id"), 10);
+        return isNaN(id) ? 1 : id;
+    }
+
+    let currentRecipeId = getRecipeIdFromUrl();
+    const mainImage = document.getElementById("mainImage");
+    const ingredientsList = document.getElementById("ingredientsList");
+    const stepsList = document.getElementById("stepsList");
+    const commentsContainer = document.getElementById("commentsContainer");
+    const commentForm = document.getElementById("commentForm");
+    const commentAuthor = document.getElementById("commentAuthor");
+    const commentText = document.getElementById("commentText");
+    const favoriteRecipeBtn = document.getElementById("favoriteRecipeBtn");
+    const portionsSelect = document.getElementById("portionsSelect");
+    const recipeLoading = document.getElementById("recipeLoading");
+    const recipeContent = document.getElementById("recipeContent");
+    const recipeError = document.getElementById("recipeError");
+    const recipeTitle = document.getElementById("recipeTitle");
+    const previewList = document.getElementById("previewList");
+
+    async function loadRecipe(portions = 4) {
+        recipeLoading.style.display = "block";
+        recipeContent.style.display = "none";
+        recipeError.style.display = "none";
+
+        try {
+            const response = await fetch(API_BASE_URL + `/api/recipes/${currentRecipeId}?portions=${portions}`, { method: "GET" });
+            if (!response.ok) throw new Error("Рецепт не найден");
+
+            const data = await response.json();
+
+            document.title = "Кулинарный проект - " + data.title;
+            recipeTitle.textContent = data.title;
+            mainImage.src = (data.image && data.image.startsWith("data:")) ? data.image : "images/" + data.image;
+            mainImage.alt = data.title;
+            mainImage.onerror = function() { this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect fill='%23e8dfd0' width='400' height='300'/%3E%3Ctext fill='%235a3d1e' font-family='Arial' font-size='18' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EИзображение%3C/text%3E%3C/svg%3E"; this.onerror = null; };
+
+            ingredientsList.innerHTML = "";
+            data.ingredients.forEach(ing => {
+                const li = document.createElement("li");
+                li.textContent = `${ing.name} — ${ing.displayAmount}`;
+                ingredientsList.appendChild(li);
+            });
+
+            stepsList.innerHTML = "";
+            data.steps.forEach((step, i) => {
+                const li = document.createElement("li");
+                li.textContent = step;
+                stepsList.appendChild(li);
+            });
+
+            var imgPath = (data.image && data.image.startsWith("data:")) ? data.image : "images/" + data.image;
+            previewList.innerHTML = `<img src="${imgPath}" data-big="${imgPath}">`;
+
+            recipeLoading.style.display = "none";
+            recipeContent.style.display = "block";
+        } catch (e) {
+            recipeLoading.style.display = "none";
+            recipeError.style.display = "block";
+            recipeError.textContent = "Не удалось загрузить рецепт. " + (e.message || "");
+        }
+    }
+
+    portionsSelect.addEventListener("change", () => {
+        const portions = parseInt(portionsSelect.value, 10);
+        loadRecipe(portions);
+    });
+
+    function renderComments(comments) {
+        commentsContainer.innerHTML = "";
+        if (!comments || comments.length === 0) {
+            commentsContainer.textContent = "Пока нет ни одного комментария. Будьте первым!";
+            return;
+        }
+        const list = document.createElement("ul");
+        comments.forEach(c => {
+            const li = document.createElement("li");
+            li.innerHTML = `<strong>${c.author}</strong> (${c.createdAt}):<br/>${c.text}`;
+            list.appendChild(li);
+        });
+        commentsContainer.appendChild(list);
+    }
+
+    async function loadComments() {
+        try {
+            const response = await fetch(API_BASE_URL + "/api/comments?recipeId=" + currentRecipeId, { method: "GET" });
+            const data = await response.json();
+            renderComments(data);
+        } catch (e) {
+            commentsContainer.textContent = "Ошибка при загрузке комментариев.";
+        }
+    }
+
+    if (commentForm) {
+        commentForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const author = commentAuthor.value.trim();
+            const text = commentText.value.trim();
+            if (!author || !text) return;
+            try {
+                const response = await fetch(API_BASE_URL + "/api/comments", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ recipeId: currentRecipeId, author, text })
+                });
+                const data = await response.json();
+                if (data && data.success) {
+                    commentAuthor.value = "";
+                    commentText.value = "";
+                    await loadComments();
+                }
+            } catch (e) {
+                console.error("Ошибка при отправке комментария", e);
+            }
+        });
+    }
+
+    async function loadFavoriteForRecipe() {
+        try {
+            const response = await fetch(API_BASE_URL + "/api/favorites", { method: "GET" });
+            if (!response.ok) return;
+            const favorites = await response.json();
+            if (favorites.includes(currentRecipeId)) {
+                favoriteRecipeBtn.classList.add("favorite-btn--active");
+                favoriteRecipeBtn.textContent = "★";
+            } else {
+                favoriteRecipeBtn.classList.remove("favorite-btn--active");
+                favoriteRecipeBtn.textContent = "☆";
+            }
+        } catch (e) {
+            console.error("Ошибка при загрузке избранного", e);
+        }
+    }
+
+    if (favoriteRecipeBtn) {
+        favoriteRecipeBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const isActive = favoriteRecipeBtn.classList.contains("favorite-btn--active");
+            const action = isActive ? "remove" : "add";
+            try {
+                const response = await fetch(API_BASE_URL + "/api/favorites", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ recipeId: currentRecipeId, action })
+                });
+                const data = await response.json();
+                if (data && data.success) {
+                    if (data.isFavorite) {
+                        favoriteRecipeBtn.classList.add("favorite-btn--active");
+                        favoriteRecipeBtn.textContent = "★";
+                    } else {
+                        favoriteRecipeBtn.classList.remove("favorite-btn--active");
+                        favoriteRecipeBtn.textContent = "☆";
+                    }
+                }
+            } catch (e) {
+                console.error("Ошибка при изменении избранного", e);
+            }
+        });
+    }
+
+    mainImage.addEventListener("click", () => {
+        document.getElementById("modalImg").src = mainImage.src;
+        document.getElementById("modal").style.display = "flex";
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const portions = parseInt(portionsSelect.value, 10) || 4;
+        loadRecipe(portions);
+        loadComments();
+        loadFavoriteForRecipe();
+    });
+</script>
+
+</body>
+</html>

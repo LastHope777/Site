@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="catalog.css" />
+    <title>Кулинарный проект - Каталог рецептов</title>
+</head>
+<body>
+
+    <header>
+        <p><strong>Кулинарный проект</strong></p>
+        <nav>
+            <a href="index.html"><button>Логотип</button></a>
+            <a href="catalog.html"><button>Каталог рецептов</button></a>
+            <a href="cafes.html"><button>Каталог кафе и ресторанов</button></a>
+            <a href="articles.html"><button>Статьи и советы</button></a>
+            <a href="about.html"><button>О проекте и контакты</button></a>
+            <a href="faq.html"><button>Ответы на вопросы</button></a>
+            <a href="account.html"><button>Личный кабинет</button></a>
+            <a href="add_recipe.html"><button>Добавить рецепт</button></a>
+        </nav>
+    </header>
+
+    <main class="catalog-page">
+        <div class="filters-section">
+            <h2>Фильтры</h2>
+            <div class="filter-group">
+                <h3>Кухня</h3>
+                <div class="filter-chips">
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="russian" /> Русская</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="italian" /> Итальянская</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="japan" /> Японская</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="china" /> Китайская</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="american" /> Американская</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="french" /> Французская</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="arabic" /> Арабская</label>
+                </div>
+            </div>
+            <div class="filter-group">
+                <h3>Тип блюда</h3>
+                <div class="filter-chips">
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="soup" /> Суп</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="salad" /> Салат</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="dessert" /> Десерт</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="main" /> Основное</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="garnish" /> Гарнир</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="drink" /> Напиток</label>
+                </div>
+            </div>
+            <div class="filter-group">
+                <h3>Ингредиент</h3>
+                <div class="filter-chips">
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="meat" /> Мясо</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="veggy" /> Овощи</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="fish" /> Рыба</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="grain" /> Крупы</label>
+                </div>
+            </div>
+            <div class="filter-group">
+                <h3>Особенности</h3>
+                <div class="filter-chips">
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="veg" /> Вегетарианское</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="nolact" /> Без лактозы</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="nogluten" /> Без глютена</label>
+                    <label class="filter-chip"><input type="checkbox" class="filter" data-tag="nosugar" /> Без сахара</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <label for="searchInput"><strong>Поиск:</strong></label>
+            <input type="text" id="searchInput" placeholder="Название блюда или ингредиент..." />
+        </div>
+
+        <h1>Все рецепты</h1>
+        <div id="recipesContainer" class="recipes-grid">
+            <!-- Содержимое подгружается через AJAX -->
+        </div>
+
+    </main>
+
+    <footer>
+        <a href="catalog.html"><button>Каталог рецептов</button></a>
+        <a href="add_recipe.html"><button>Добавить рецепт</button></a>
+        <p>Email: nikita_pishk@rambler.ru</p>
+        <p>Phone: +7(929)854-05-20</p>
+    </footer>
+
+    <script>
+        const filters = document.querySelectorAll(".filter");
+        const searchInput = document.getElementById("searchInput");
+        const recipesContainer = document.getElementById("recipesContainer");
+
+        const API_BASE_URL = "nikitapishkov-001-site1.ntempurl.com";
+        const IMAGES_PATH = "images/";
+        const PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='180' viewBox='0 0 250 180'%3E%3Crect fill='%23e8dfd0' width='250' height='180'/%3E%3Ctext fill='%235a3d1e' font-family='Arial' font-size='14' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EРецепт%3C/text%3E%3C/svg%3E";
+
+        function getImageUrl(filename) {
+            if (!filename) return PLACEHOLDER_IMG;
+            return IMAGES_PATH + filename;
+        }
+
+        function getActiveTags() {
+            return [...filters]
+                .filter(x => x.checked)
+                .map(x => x.dataset.tag);
+        }
+
+        function renderRecipes(recipes) {
+            recipesContainer.innerHTML = "";
+
+            if (!recipes || recipes.length === 0) {
+                recipesContainer.innerHTML = "<p class='no-results'>Ничего не найдено по заданным условиям.</p>";
+                return;
+            }
+
+            recipes.forEach(recipe => {
+                const card = document.createElement("article");
+                card.className = "recipe-card";
+                card.innerHTML = `
+                    <a href="recipe.html?id=${recipe.id}" class="recipe-card__link">
+                        <div class="recipe-card__image-wrap">
+                            <img src="${getImageUrl(recipe.image)}" alt="${recipe.title}" class="recipe-card__image"
+                                 onerror="this.src='${PLACEHOLDER_IMG}'; this.onerror=null;" />
+                        </div>
+                        <h3 class="recipe-card__title">
+                            ${recipe.title}
+                            <button type="button" class="favorite-btn" data-id="${recipe.id}" aria-label="В избранное">☆</button>
+                        </h3>
+                    </a>
+                    <p class="recipe-card__desc">${recipe.description}</p>
+                `;
+                recipesContainer.appendChild(card);
+            });
+
+            attachFavoriteHandlers();
+        }
+
+        async function loadRecipes() {
+            const tags = getActiveTags();
+            const params = new URLSearchParams();
+
+            if (tags.length > 0) {
+                params.set("tags", tags.join(","));
+            }
+
+            const q = searchInput.value.trim();
+            if (q) {
+                params.set("q", q);
+            }
+
+            try {
+                const response = await fetch(API_BASE_URL + "/api/recipes?" + params.toString(), {
+                    method: "GET"
+                });
+                const data = await response.json();
+                renderRecipes(data);
+                await loadFavoritesState();
+            } catch (e) {
+                console.error("Ошибка при загрузке рецептов", e);
+            }
+        }
+
+        let searchTimeout;
+
+        filters.forEach(f => {
+            f.addEventListener("change", () => {
+                loadRecipes();
+            });
+        });
+
+        if (searchInput) {
+            searchInput.addEventListener("input", () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(loadRecipes, 400);
+            });
+        }
+
+        async function loadFavoritesState() {
+            try {
+                const response = await fetch(API_BASE_URL + "/api/favorites", { method: "GET" });
+                if (!response.ok) return;
+                const favorites = await response.json();
+
+                document.querySelectorAll(".favorite-btn").forEach(btn => {
+                    const id = parseInt(btn.dataset.id, 10);
+                    if (favorites.includes(id)) {
+                        btn.classList.add("favorite-btn--active");
+                        btn.textContent = "★";
+                    } else {
+                        btn.classList.remove("favorite-btn--active");
+                        btn.textContent = "☆";
+                    }
+                });
+            } catch (e) {
+                console.error("Ошибка при загрузке избранного", e);
+            }
+        }
+
+        function attachFavoriteHandlers() {
+            document.querySelectorAll(".favorite-btn").forEach(btn => {
+                btn.addEventListener("click", async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const recipeId = btn.dataset.id;
+                    const isActive = btn.classList.contains("favorite-btn--active");
+                    const action = isActive ? "remove" : "add";
+
+                    try {
+                        const response = await fetch(API_BASE_URL + "/api/favorites", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                recipeId: parseInt(recipeId, 10),
+                                action: action
+                            })
+                        });
+                        const data = await response.json();
+                        if (data && data.success) {
+                            if (data.isFavorite) {
+                                btn.classList.add("favorite-btn--active");
+                                btn.textContent = "★";
+                            } else {
+                                btn.classList.remove("favorite-btn--active");
+                                btn.textContent = "☆";
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Ошибка при изменении избранного", e);
+                    }
+                });
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadRecipes();
+        });
+    </script>
+
+</body>
+</html>

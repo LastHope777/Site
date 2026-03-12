@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Кулинарный проект - Ответы на вопросы</title>
+
+    <style>
+        .faq-item {
+            margin-bottom: 12px;
+            width: 600px;
+        }
+
+        .faq-question {
+            background-color: #fff6dd;
+            padding: 10px;
+            border: 1px solid #b8860b;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Стрелка вниз по умолчанию */
+        .arrow {
+            font-size: 18px;
+            color: #8b4513;
+            transition: transform 0.3s ease;
+            display: inline-block;
+            transform: rotate(0deg); /* ▼ */
+        }
+
+        /* При открытии поворачиваем на 180° = ▲ */
+        .open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            display: none;
+            padding: 10px;
+            border-left: 1px solid #b8860b;
+            border-right: 1px solid #b8860b;
+            border-bottom: 1px solid #b8860b;
+            background-color: #fffdf5;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1; /* растягивает контент */
+        }
+
+        footer {
+            margin-top: auto; /* прижимает футер вниз */
+        }
+
+    </style>
+</head>
+
+<body>
+
+<header>
+    <p><strong>Кулинарный проект</strong></p>
+    <nav>
+        <a href="index.html"><button>Логотип</button></a>
+        <a href="catalog.html"><button>Каталог рецептов</button></a>
+        <a href="cafes.html"><button>Каталог кафе и ресторанов</button></a>
+        <a href="articles.html"><button>Статьи и советы</button></a>
+        <a href="about.html"><button>О проекте и контакты</button></a>
+        <a href="faq.html"><button>Ответы на вопросы</button></a>
+        <a href="account.html"><button>Личный кабинет</button></a>
+    </nav>
+</header>
+
+<main>
+    <h1>Ответы на вопросы</h1>
+    <p><strong>Популярные вопросы пользователей</strong></p>
+
+    <!-- Вопрос 1 -->
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+            В рамках какой дисциплины разработан данный проект?
+            <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            В рамках дисциплины "Технологии сети интернет".
+        </div>
+    </div>
+
+    <!-- Вопрос 2 -->
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+            Кто является автором данного проекта?
+            <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            Автор — студент 4-го курса Самарского университета направления
+            «Фундаментальная информатика и информационные технологии» Пишков Никита Вадимович.
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <a href="catalog.html"><button>Каталог рецептов</button></a>
+    <a href="cafes.html"><button>Каталог кафе и ресторанов</button></a>
+    <a href="articles.html"><button>Статьи и советы</button></a>
+    <a href="about.html"><button>О проекте и контакты</button></a>
+    <a href="faq.html"><button>Ответы на вопросы</button></a>
+    <a href="account.html"><button>Личный кабинет</button></a>
+    <p>Email: nikita_pishk@rambler.ru</p>
+    <p>Phone: +7(929)854-05-20</p>
+</footer>
+
+<script>
+    function toggleFAQ(element) {
+        const answer = element.nextElementSibling;
+        const isOpen = element.classList.contains("open");
+
+        answer.style.display = isOpen ? "none" : "block";
+        element.classList.toggle("open");
+    }
+</script>
+
+</body>
+</html>

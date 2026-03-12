@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Кулинарный проект - Личный кабинет</title>
+
+    <style>
+        table {
+            border: 2px solid #b8860b;
+            background-color: #fff8e1;
+        }
+        td img {
+            border-radius: 8px;
+        }
+
+        /* Плавающий хэдер */
+        #stickyHeader {
+            position: fixed;
+            top: -80px; /* скрыт */
+            left: 0;
+            width: 100%;
+            background-color: #fffaf0;
+            border-bottom: 2px solid #b8860b;
+            padding: 10px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            transition: top 0.3s ease;
+            z-index: 999;
+        }
+        /* Делаем хэдер фиксированным */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+            background-color: #fffaf0;
+            border-bottom: 2px solid #d2b48c;
+            padding: 15px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        /* Чтобы контент не прятался под хедер */
+        body {
+            padding-top: 120px; /* регулируй по высоте своего хедера */
+        }
+
+        /* Добавляется тень при скролле */
+        header.scrolled {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Плавающий хэдер -->
+    <div id="stickyHeader">Кулинарный проект — Личный кабинет</div>
+
+    <header>
+        <p><strong>Кулинарный проект</strong></p>
+        <nav>
+            <a href="index.html"><button>Логотип</button></a>
+            <a href="catalog.html"><button>Каталог рецептов</button></a>
+            <a href="cafes.html"><button>Каталог кафе и ресторанов</button></a>
+            <a href="articles.html"><button>Статьи и советы</button></a>
+            <a href="about.html"><button>О проекте и контакты</button></a>
+            <a href="faq.html"><button>Ответы на вопросы</button></a>
+            <a href="account.html"><button>Личный кабинет</button></a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Личный кабинет</h1>
+        <p><strong>Пользователь:</strong> Никита Пишков</p>
+        <p>Ваши избранные рецепты:</p>
+
+        <table border="1">
+            <tr>
+                <td><img src="cake.jpg" alt="Шоколадный торт" width="250" height="180" /></td>
+                <td valign="top">
+                    <p><strong>Шоколадный торт</strong></p>
+                    <p>Насыщенный десерт на основе какао, масла и сливок. Отлично подходит для праздничного стола.</p>
+                </td>
+            </tr>
+            <tr>
+                <td><img src="sharlotka.jpg" alt="Шарлотка" width="250" height="180" /></td>
+                <td valign="top">
+                    <p><a href="recipe.html"><strong>Шарлотка</strong></a></p>
+                    <p>Сладкий десерт из яблок, запечённых в тесте.</p>
+                </td>
+            </tr>
+        </table>
+
+        <p><a href="add_recipe.html"><button>Добавить рецепт</button></a></p>
+    </main>
+
+    <footer>
+        <a href="catalog.html"><button>Каталог рецептов</button></a>
+        <a href="cafes.html"><button>Каталог кафе и ресторанов</button></a>
+        <a href="articles.html"><button>Статьи и советы</button></a>
+        <a href="about.html"><button>О проекте и контакты</button></a>
+        <a href="faq.html"><button>Ответы на вопросы</button></a>
+        <a href="account.html"><button>Личный кабинет</button></a>
+        <p>Email: nikita_pishk@rambler.ru</p>
+        <p>Phone: +7(929)854-05-20</p>
+    </footer>
+
+    <script>
+        const header = document.querySelector("header");
+
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 50) {
+                header.classList.add("scrolled");
+            } else {
+                header.classList.remove("scrolled");
+            }
+        });
+    </script>
+
+
+</body>
+</html>
