@@ -5,12 +5,13 @@ using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Добавляем сервисы
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                      ?? "Server=localhost;Database=CookingProjectDb;Trusted_Connection=True;TrustServerCertificate=True;";
+// Берем строку подключения из конфига (там должна быть база SmarterASP)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -27,32 +28,28 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// ВКЛЮЧАЕМ SWAGGER ВСЕГДА (чтобы точно открылся на защите)
+app.UseSwagger();
+app.UseSwaggerUI(c => {
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cooking API V1");
+    c.RoutePrefix = "swagger"; 
+});
 
 app.UseCors("AllowAll");
 
-
-var staticRoot = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, ".."));
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(staticRoot),
-    RequestPath = ""
-});
+// НАСТРОЙКА СТАТИКИ (Простой и надежный вариант)
+app.UseDefaultFiles(); // Позволяет открывать index.html или default.html автоматически
+app.UseStaticFiles();  // Раздает файлы из папки wwwroot
 
 app.UseRouting();
-
 app.UseAuthorization();
-app.UseDefaultFiles();
-app.UseStaticFiles();
 
-app.MapGet("/", () => Results.Redirect("/swagger"));
-
+// Перенаправляем пустой адрес на твой каталог (или на swagger, как хочешь)
+app.MapGet("/", context => {
+    context.Response.Redirect("/catalog.html");
+    return Task.CompletedTask;
+});
 
 app.MapControllers();
 
 app.Run();
-
